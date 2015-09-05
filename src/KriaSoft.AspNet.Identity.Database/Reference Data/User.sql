@@ -5,9 +5,9 @@ MERGE INTO [dbo].[User] AS Target
 USING (VALUES
 
     (1, N'admin', N'admin@example.com', 0, N'ACe+kHUdH61ms8NbkXSCXyV34CEP7tjfj93JrtlKRPfShGurFdAujQrmbVA7J9MDbg==',
-        N'9771f91d-b4a0-45e0-8971-899b907c5863', NULL, 0, 0, NULL, 0, 0),
+        N'9771f91d-b4a0-45e0-8971-899b907c5863', NULL, 0, 0, NULL, 0, 0, 'ref'),
     (2, N'user', N'user@example.com', 0, N'ACe+kHUdH61ms8NbkXSCXyV34CEP7tjfj93JrtlKRPfShGurFdAujQrmbVA7J9MDbg==',
-        N'9771f91d-b4a0-45e0-8971-899b907c5863', NULL, 0, 0, NULL, 0, 0)
+        N'9771f91d-b4a0-45e0-8971-899b907c5863', NULL, 0, 0, NULL, 0, 0, 'ref')
 
 ) AS Source (
     [UserID],
@@ -21,7 +21,8 @@ USING (VALUES
     [TwoFactorEnabled],
     [LockoutEndDateUtc],
     [LockoutEnabled],
-    [AccessFailedCount]
+    [AccessFailedCount],
+	[TenantId]
 )
 ON Target.[UserID] = Source.[UserID]
 -- Update matched rows
@@ -37,7 +38,8 @@ UPDATE SET
     [TwoFactorEnabled] = Source.[TwoFactorEnabled],
     [LockoutEndDateUtc] = Source.[LockoutEndDateUtc],
     [LockoutEnabled] = Source.[LockoutEnabled],
-    [AccessFailedCount] = Source.[AccessFailedCount]
+    [AccessFailedCount] = Source.[AccessFailedCount],
+	[TenantId] = Source.[TenantId]
 -- Insert new rows
 WHEN NOT MATCHED BY TARGET THEN
 INSERT (
@@ -52,7 +54,8 @@ INSERT (
     [TwoFactorEnabled],
     [LockoutEndDateUtc],
     [LockoutEnabled],
-    [AccessFailedCount]
+    [AccessFailedCount],
+	[TenantId]
 )
 VALUES (
     [UserID],
@@ -66,7 +69,8 @@ VALUES (
     [TwoFactorEnabled],
     [LockoutEndDateUtc],
     [LockoutEnabled],
-    [AccessFailedCount]
+    [AccessFailedCount],
+	[TenantId]
 );
 GO
 

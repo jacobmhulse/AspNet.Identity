@@ -22,7 +22,7 @@ namespace KriaSoft.AspNet.Identity.DbFirst
             app.CreatePerOwinContext<ApplicationDbContext>(() => new ApplicationDbContext());
             app.CreatePerOwinContext<UserManager<User, int>>(
                 (IdentityFactoryOptions<UserManager<User, int>> options, IOwinContext context) =>
-                    new UserManager<User, int>(new UserStore(context.Get<ApplicationDbContext>())));
+                    new UserManager<User, int>(new UserStore(context.Get<ApplicationDbContext>(), "ref")));
 
             // Enable the application to use bearer tokens to authenticate users
             app.UseOAuthBearerTokens(new OAuthAuthorizationServerOptions

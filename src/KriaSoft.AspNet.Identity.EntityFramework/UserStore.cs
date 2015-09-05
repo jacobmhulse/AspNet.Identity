@@ -20,15 +20,27 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
     {
         private readonly ApplicationDbContext db;
 
-        public UserStore(ApplicationDbContext db)
+        public virtual string TenantId { get; set; }
+        /// <summary>
+        /// Throws exceptions if the state of the object is invalid or has been disposed.
+        /// </summary>
+        private void ThrowIfInvalid()
         {
-            if (db == null)
-            {
-                throw new ArgumentNullException("db");
-            }
-
-            this.db = db;
+            if (EqualityComparer<string>.Default.Equals(TenantId, default(string)))
+                throw new InvalidOperationException("The TenantId has not been set.");
         }
+
+        public UserStore(ApplicationDbContext db, string TenantId)
+        {
+            if (db == null) { throw new ArgumentNullException("db"); }
+            this.db = db;
+            
+            if (TenantId == null) { throw new ArgumentNullException("TenantId"); }
+            this.TenantId = TenantId;
+                        
+        }
+
+
 
         //// IQueryableUserStore<User, int>
 
@@ -60,9 +72,11 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
 
         public Task<User> FindByNameAsync(string userName)
         {
+            ThrowIfInvalid();
+
             return this.db.Users
                 .Include(u => u.Logins).Include(u => u.Roles).Include(u => u.Claims)
-                .FirstOrDefaultAsync(u => u.UserName == userName);
+                .FirstOrDefaultAsync(u => u.UserName == userName && u.TenantId == TenantId);
         }
 
         public Task UpdateAsync(User user)
@@ -128,6 +142,8 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
                 throw new ArgumentNullException("login");
             }
 
+            ThrowIfInvalid();
+
             var provider = login.LoginProvider;
             var key = login.ProviderKey;
 
@@ -140,7 +156,7 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
 
             return await this.db.Users
                 .Include(u => u.Logins).Include(u => u.Roles).Include(u => u.Claims)
-                .FirstOrDefaultAsync(u => u.Id.Equals(userLogin.UserId));
+                .FirstOrDefaultAsync(u => u.Id.Equals(userLogin.UserId) && u.TenantId == TenantId);
         }
 
         public Task<IList<UserLoginInfo>> GetLoginsAsync(User user)
@@ -336,9 +352,11 @@ namespace KriaSoft.AspNet.Identity.EntityFramework
 
         public Task<User> FindByEmailAsync(string email)
         {
+            ThrowIfInvalid();
+
             return this.db.Users
                 .Include(u => u.Logins).Include(u => u.Roles).Include(u => u.Claims)
-                .FirstOrDefaultAsync(u => u.Email == email);
+                .FirstOrDefaultAsync(u => u.Email == email && u.TenantId == TenantId);
         }
 
         public Task<string> GetEmailAsync(User user)

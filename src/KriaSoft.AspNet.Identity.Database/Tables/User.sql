@@ -13,6 +13,7 @@
     [LockoutEnabled]       [dbo].[Flag]           NOT NULL,
     [AccessFailedCount]    INT                    NOT NULL,
 
+    [TenantId] NVARCHAR(50) NOT NULL, 
     CONSTRAINT [PK_User_UserID] PRIMARY KEY CLUSTERED ([UserID] ASC),
     CONSTRAINT [UK_User_UserName] UNIQUE NONCLUSTERED ([UserName] ASC)
 );
